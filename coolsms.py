@@ -130,7 +130,7 @@ class rest:
 		self.imgfile = image
 
 	# access to send resource
-	def send(self, to=None, text=None, sender=None, mtype=None, subject=None, image=None, datetime=None, extension=None, app_version=None):
+	def send(self, to=None, text=None, sender=None, mtype=None, subject=None, image=None, datetime=None, extension=None, app_version=None, country=None):
 		"""Request to REST API server to send SMS messages
 
 		Arguments:
@@ -192,6 +192,8 @@ class rest:
 			fields['datetime'] = datetime
 		if extension:
 			fields['extension'] = extension
+		if country:
+			fields['country'] = country
 
 		if image == None:
 			image = self.imgfile
