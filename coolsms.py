@@ -7,7 +7,10 @@ import uuid
 import json
 import time
 import platform
-if sys.version_info.major == 2:
+
+# sys.version_info.major is available in python version 2.7
+# use sys.version_info[0] for python 2.6
+if sys.version_info[0] == 2:
     from httplib import HTTPSConnection
     from urllib import urlencode
 else:
@@ -160,7 +163,7 @@ class rest:
             A JSON type string will be returned. On failure, False will be returned.
         """
         # convert list to a comma seperated string
-        if sys.version_info.major == 2:
+        if sys.version_info[0] == 2:
             t_temp = text.decode('utf-8')
             text = t_temp.encode('utf-8')
             text = unicode(text, encoding='utf-8')
