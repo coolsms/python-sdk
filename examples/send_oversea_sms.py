@@ -14,7 +14,7 @@ def main():
 	sender = '01012345678'
 	message = '테스트 메시지'
 	cool = coolsms.rest(api_key, api_secret, 'Example 1.0')
-	status = cool.send(to,message,sender,country='81')
+	status = cool.send(to,message,sender,country='81') # <---- 국가번호 입력
 	print status
 	if status == False:
 		print "ERROR: %s" % cool.get_error()
