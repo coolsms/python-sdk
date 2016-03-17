@@ -30,7 +30,7 @@ def post_multipart(host, selector, fields, files):
     h = HTTPSConnection(host)
     h.putrequest('POST', selector)
     h.putheader('content-type', content_type)
-    h.putheader('content-length', str(len(body)))
+    h.putheader('content-length', str(len(body.encode('utf-8'))))
     h.putheader('User-Agent', 'sms-python')
     h.endheaders()
     h.send(body.encode('utf-8'))
