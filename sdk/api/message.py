@@ -2,10 +2,11 @@
 # -*- coding: utf8 -*-
 
 import sys
+import platform
 sys.path.insert(0, "../../")
 
 from sdk.coolsms import Coolsms
-from sdk import exceptions
+from sdk.exceptions import CoolsmsSDKException
 
 #import sdk.coolsms
 
@@ -18,11 +19,7 @@ class Message:
         Coolsms(api_key, api_secret)
 
     # access to send resource
-    def send(params):
-        if type(params) is not str:
-            print("ERROR")
-            #raise Exception("ERROR", "TT")
-
+    def send(self, params):
         """Request to REST API server to send SMS messages
 
         Arguments:
@@ -42,25 +39,35 @@ class Message:
         Returns:
             A JSON type string will be returned. On failure, thorw Exception
         """
+        
+        print("GG")
+        print(type(params))
+        if type(params) is not dict:
+            raise CoolsmsSDKException("params type is no dictionary")
+
+        for key, val in params.items():
+            print("Code : {0}, Value : {1}".format(key, val))
+            if key == "text" and sys.version_info[0] == 2:
+                t_temp = text.decode('utf-8')
+                text = t_temp.encode('utf-8')
+                text = unicode(text, encoding='utf-8')
+                params['text'] = text
+
+            if key == "to" and type(to) == list:
+                to = ','.join(to)
+
+
+        params['os_platform'] = platform.system()
+        params['dev_lang'] = "Python %s" % platform.python_version()
+        params['sdk_version'] = "sms-python %s" % Coolsms.sdk_version
+         
+        for key, val in params.items():
+            print("Code : {0}, Value : {1}".format(key, val))
+
 
         # convert list to a comma seperated string
-        if sys.version_info[0] == 2:
-            t_temp = text.decode('utf-8')
-            text = t_temp.encode('utf-8')
-            text = unicode(text, encoding='utf-8')
-        if type(to) == list:
-            to = ','.join(to)
-
-        if type:
-            if type.lower() not in ['sms', 'lms', 'mms']:
-                self.__set_error__('invalid message type')
-                return False
-        else:
-            type = self.get_type()
-
-        os_platform = platform.system()
-        dev_lang = "Python %s" % platform.python_version()
-        sdk_version = "sms-python %s" % __version__
+        """
+        
         if app_version:
             self.app_version = app_version
 
@@ -135,6 +142,7 @@ class Message:
             self.__set_error__("%s:%s" % (err['code'], reason))
             return False
         return json.loads(response)
+        """
 
     # access to sent resource
     def status(self, page=1, count=20, s_rcpt=None, s_start=None, s_end=None, mid=None):

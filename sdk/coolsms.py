@@ -22,11 +22,12 @@ else:
  http://www.coolsms.co.kr
 """
 
-__version__ = "2.0"
-
 # class Coolsms 
 # Gateway access url : https://api.coolsms.co.kr/{api type}/{verson}/{resource name}
 class Coolsms:
+    # SDK Version
+    sdk_version = "2.0"
+
     # SMS Gateway address
     host = 'api.coolsms.co.kr'
 
