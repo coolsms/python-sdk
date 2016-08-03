@@ -11,15 +11,21 @@ from sdk.exceptions import CoolsmsSDKException
 from sdk.exceptions import CoolsmsSystemException
 from sdk.exceptions import CoolsmsServerException
 
-# class Message 
+## @class Message 
+#  @brief management message, using Rest API
 class Message:
+    # Coolsms Object
     cool = None
 
-    # initialize
+    ## @brief initialize
+    #  @param string api_key [required]
+    #  @param string api_secret [required]
     def __init__(self, api_key, api_secret):
         self.cool = Coolsms(api_key, api_secret)
 
-    # access to send resource
+    ## @brief access to send resource
+    #  @param dictionary params [required]
+    #  @return JSONObject
     def send(self, params):
         """Request to REST API server to send SMS messages
 
@@ -88,22 +94,30 @@ class Message:
         response = self.cool.request_post_multipart("send", params, files)
         return response
 
-    # access to statusresource
+    ## @brief access to statusresource
+    #  @param dictionary params [optional]
+    #  @return JSONObject
     def status(self, params=None):
         response = self.cool.request_get('status', params)
         return response 
 
-    # access to status resource
+    ## @brief access to status resource
+    #  @param dictionary params [optional]
+    #  @return JSONObject
     def sent(self, params=None):
         response = self.cool.request_get('sent', params)
         return response 
 
-    # access to balance resource
+    ## @brief access to balance resource
+    #  @param dictionary params [optional]
+    #  @return JSONObject
     def balance(self):
         response = self.cool.request_get('balance')
         return response
 
-    # access to cancel resource
+    ## @brief access to cancel resource
+    #  @param dictionary params [optional]
+    #  @return JSONObject
     def cancel(self, params):
         if 'message_id' not in params and 'group_id' not in params:
             raise CoolsmsSDKException("message_id or group_id either one must be entered", 202)

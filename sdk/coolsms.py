@@ -1,6 +1,6 @@
 # vi:set sw=4 ts=4 expandtab:
 # -*- coding: utf8 -*-
-from hashlib import md5
+
 import sys
 import hmac
 import mimetypes
@@ -9,6 +9,7 @@ import json
 import time
 import platform
 
+from hashlib import md5
 from sdk.exceptions import CoolsmsServerException
 
 # sys.version_info.major is available in python version 2.7
@@ -19,13 +20,22 @@ if sys.version_info[0] == 2:
 else:
     from http.client import HTTPSConnection
     from urllib.parse import urlencode
-"""
- Copyright (C) 2008-2016 NURIGO
- http://www.coolsms.co.kr
-"""
 
-# class Coolsms 
-# Gateway access url : https://api.coolsms.co.kr/{api type}/{verson}/{resource name}
+## @mainpage PYTHON SDK
+#  @section intro 소개
+#      - 소개 : Coolsms REST API SDK FOR PYTHON
+#      - 버전 : 2.0
+#      - 설명 : Coolsms REST API 를 이용 보다 빠르고 안전하게 문자메시지를 보낼 수 있는 PYTHON으로 만들어진 SDK 입니다.
+#  @section CreateInfo 작성 정보
+#      - 작성자 : Nurigo
+#      - 작성일 : 2016/05/13 * 
+#  @section common 기타 정보
+#      - 저작권 GPL v2
+#      - Copyright (C) 2008-2016 NURIGO
+#      - http://www.coolsms.co.kr
+
+## @class Coolsms 
+#  @brief Gateway access url : https://api.coolsms.co.kr/{api type}/{verson}/{resource name}
 class Coolsms:
     # SDK Version
     sdk_version = "2.0"
@@ -48,27 +58,25 @@ class Coolsms:
     # error handle
     error_string = None
 
-    # constructor
+    ## @brief initialize
+    #  @param string api_key [required]
+    #  @param string api_secret [required]
     def __init__(self, api_key=str(), api_secret=str()):
         self.api_key = api_key
         self.api_secret = api_secret
 
-    # return salt, timestamp, signature
+    ## @brief get signature
+    #  @return string salt, string timestamp, string signature
     def __get_signature__(self):
         salt = str(uuid.uuid1())
         timestamp = str(int(time.time()))
         data = timestamp + salt
         return timestamp, salt, hmac.new(self.api_secret.encode(), data.encode(), md5)
 
-    # error handle
-    def __set_error__(self, error_str):
-        self.error_string = error_str
-
-    # return error string set
-    def get_error(self):
-        return self.error_string
-
-    # http GET request 
+    ## @brief http GET method request 
+    #  @param string resource [required]
+    #  @param dictionary params [optional]
+    #  @return JSONObject
     def request_get(self, resource, params=None):
         if params == None:
             params = dict()
@@ -94,7 +102,10 @@ class Coolsms:
 
         return obj
 
-    # http POST request
+    ## @brief http POST method request 
+    #  @param string resource [required]
+    #  @param dictionary params [optional]
+    #  @return JSONObject
     def request_post(self, resource, params=None):
         if params == None:
             params = dict()
@@ -119,7 +130,11 @@ class Coolsms:
 
         return obj
 
-    # send multipart form to the server
+    ## @brief http POST method multipart form request 
+    #  @param string resource [required]
+    #  @param dictionary params [optional]
+    #  @param dictionary files [optional]
+    #  @return JSONObject
     def request_post_multipart(self, resource, params, files):
         host = self.host + ':' + str(self.port)
         selector = "/sms/%s/%s" % (self.api_version, resource)
@@ -148,12 +163,15 @@ class Coolsms:
 
         return obj
 
-    # format multipart form
-    def encode_multipart_formdata(self, fields, files):
+    ## @brief format multipart form
+    #  @param dictionary params [required]
+    #  @param dictionary files [required]
+    #  @return string content_type, string body
+    def encode_multipart_formdata(self, params, files):
         boundary = str(uuid.uuid1())
         crlf = '\r\n'
         l = []
-        for key, value in fields.items():
+        for key, value in params.items():
             l.append('--' + boundary)
             l.append('Content-Disposition: form-data; name="%s"' % key)
             l.append('')
@@ -171,11 +189,15 @@ class Coolsms:
         content_type = 'multipart/form-data; boundary=%s' % boundary
         return content_type, body    
     
-    # get content type
+    ## @brief get content type
+    #  @param string filesname [required]
+    #  @return string content_type
     def get_content_type(filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
-    # set base parameter
+    ## @brief set base parameter
+    #  @param dictionary params [required]
+    #  @return dictionary params
     def set_base_params(self, params):
         timestamp, salt, signature = self.__get_signature__()
         base_params = {'api_key': self.api_key, 'timestamp': timestamp, 'salt': salt,
