@@ -6,17 +6,18 @@ import platform
 sys.path.insert(0, "../../")
 
 from sdk.coolsms import Coolsms
+from sdk.exceptions import CoolsmsException
 from sdk.exceptions import CoolsmsSDKException
-
-#import sdk.coolsms
-
-#from coolsms import coolsms
+from sdk.exceptions import CoolsmsSystemException
+from sdk.exceptions import CoolsmsServerException
 
 # class Message 
 class Message:
-    #
+    cool = None
+
+    # initialize
     def __init__(self, api_key, api_secret):
-        Coolsms(api_key, api_secret)
+        self.cool = Coolsms(api_key, api_secret)
 
     # access to send resource
     def send(self, params):
@@ -37,156 +38,75 @@ class Message:
             and more informations, visit 'http://www.coolsms.co.kr/SMS_API_v2#POSTsend'
 
         Returns:
-            A JSON type string will be returned. On failure, thorw Exception
+            A JSON type string will be returned. On failure, raise Exception
         """
-        
-        print("GG")
-        print(type(params))
+        # params type check
         if type(params) is not dict:
-            raise CoolsmsSDKException("params type is no dictionary")
+            raise CoolsmsSDKException("parameter type is not dictionary", 201)
+
+        # require fields check
+        if all (k in params for k in ("to", "from", "text")) == False:
+            raise CoolsmsSDKException("parameter 'to', 'from', 'text' is required", 201)
 
         for key, val in params.items():
             print("Code : {0}, Value : {1}".format(key, val))
+
             if key == "text" and sys.version_info[0] == 2:
                 t_temp = text.decode('utf-8')
                 text = t_temp.encode('utf-8')
                 text = unicode(text, encoding='utf-8')
                 params['text'] = text
 
-            if key == "to" and type(to) == list:
+            # convert list to a comma seperated string
+            if key == "to" and val == list:
                 to = ','.join(to)
 
+            # message type check
+            if key == "type" and val.lower() not in ['sms', 'lms', 'mms', 'ata']:
+                raise CoolsmsSDKException("message type is not supported", 201)
 
+        # system info
         params['os_platform'] = platform.system()
         params['dev_lang'] = "Python %s" % platform.python_version()
         params['sdk_version'] = "sms-python %s" % Coolsms.sdk_version
-         
-        for key, val in params.items():
-            print("Code : {0}, Value : {1}".format(key, val))
 
+        # type이 mms일때 image file check
+        files = {}
+        if 'type' in params and params['type'] == 'mms':
+            if params['image'] is None:
+                raise CoolsmsSDKException('image file is required')
 
-        # convert list to a comma seperated string
-        """
-        
-        if app_version:
-            self.app_version = app_version
-
-        # get authentication info.
-        timestamp, salt, signature = self.__get_signature__()
-
-        fields = {'api_key': self.api_key,
-                  'timestamp': timestamp,
-                  'salt': salt,
-                  'signature': signature.hexdigest(),
-                  'type': mtype,
-                  'os_platform': os_platform,
-                  'dev_lang': dev_lang,
-                  'sdk_version': sdk_version,
-                  'app_version': self.app_version}
-
-        if self.test:
-            fields['mode'] = 'test'
-        if self.srk:
-            fields['srk'] = self.srk
-        if to:
-            fields['to'] = to
-        if text:
-            fields['text'] = text
-        if sender:
-            fields['from'] = sender
-        if subject:
-            fields['subject'] = subject
-        if datetime:
-            fields['datetime'] = datetime
-        if extension:
-            fields['extension'] = extension
-        if country:
-            fields['country'] = country
-
-        if image is None:
-            image = self.imgfile
-
-        if mtype.lower() == 'mms':
-            if image is None:
-                self.__set_error__('image file path input required')
-                return False
             try:
-                with open(image, 'rb') as content_file:
+                with open(params['image'], 'rb') as content_file:
                     content = content_file.read()
-            except IOError as e:
-                self.__set_error__("I/O error({0}): {1}".format(e.errno, e.strerror))
-                return False
-            except:
-                self.__set_error__("Unknown error")
-                return False
+            except Exception as e:
+                raise CoolsmsSystemException(e, 399)
+
             files = {'image': {'filename': image, 'content': content}}
-        else:
-            files = {}
 
         # request post multipart-form
-        host = self.host + ':' + str(self.port)
-        selector = "/sms/%s/send" % self.api_version
+        response = self.cool.request_post_multipart("send", params, files)
+        return response
 
-        try:
-            status, reason, response = post_multipart(host, selector, fields, files)
-        except Exception as e:
-            print(e)
-            self.__set_error__("could not connect to server")
-            return False
-        if status != 200:
-            try:
-                err = json.loads(response)
-            except:
-                self.__set_error__("%u:%s" % (status, reason))
-                return False
-            self.__set_error__("%s:%s" % (err['code'], reason))
-            return False
-        return json.loads(response)
-        """
-
-    # access to sent resource
-    def status(self, page=1, count=20, s_rcpt=None, s_start=None, s_end=None, mid=None):
-        params = dict()
-        if page:
-            params['page'] = page
-        if count:
-            params['count'] = count
-        if s_rcpt:
-            params['s_rcpt'] = s_rcpt
-        if s_start:
-            params['s_start'] = s_start
-        if s_end:
-            params['s_end'] = s_end
-        if mid:
-            params['mid'] = mid
-        response, obj = self.request_get('sent', params)
-        return obj
+    # access to statusresource
+    def status(self, params=None):
+        response = self.cool.request_get('status', params)
+        return response 
 
     # access to status resource
-    def line_status(self, count=1):
-        params = dict()
-        if count:
-            params['count'] = count
-        response, obj = self.request_get('status', params)
-        return obj
+    def sent(self, params=None):
+        response = self.cool.request_get('sent', params)
+        return response 
 
     # access to balance resource
     def balance(self):
-        response, obj = self.request_get('balance')
-        return int(obj['cash']), int(obj['point'])
+        response = self.cool.request_get('balance')
+        return response
 
     # access to cancel resource
-    def cancel(self, mid=None, gid=None):
-        if mid is None and gid is None:
-            return False
+    def cancel(self, params):
+        if 'message_id' not in params and 'group_id' not in params:
+            raise CoolsmsSDKException("message_id or group_id either one must be entered", 202)
 
-        params = dict()
-        if mid:
-            params['mid'] = mid
-        if gid:
-            params['gid'] = gid
-
-        response, obj = self.request_post('cancel', params)
-        if response.status == 200:
-            return True
-        return False
+        response = self.cool.request_post('cancel', params)
+        return response

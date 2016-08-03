@@ -9,6 +9,8 @@ import json
 import time
 import platform
 
+from sdk.exceptions import CoolsmsServerException
+
 # sys.version_info.major is available in python version 2.7
 # use sys.version_info[0] for python 2.6
 if sys.version_info[0] == 2:
@@ -27,6 +29,9 @@ else:
 class Coolsms:
     # SDK Version
     sdk_version = "2.0"
+
+    # API Version
+    api_version = "2"
 
     # SMS Gateway address
     host = 'api.coolsms.co.kr'
@@ -65,57 +70,86 @@ class Coolsms:
 
     # http GET request 
     def request_get(self, resource, params=None):
-        timestamp, salt, signature = self.__get_signature__()
-        base_params = {'api_key': self.api_key, 'timestamp': timestamp,
-                       'salt': salt, 'signature': signature.hexdigest()}
-        if params:
-            base_params.update(params.items())
+        if params == None:
+            params = dict()
+
+        params = self.set_base_params(params)
         params_str = urlencode(base_params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
         conn.request("GET", "/sms/%s/%s?" % (self.api_version, resource) + params_str, None, headers)
         response = conn.getresponse()
-        data = response.read()
+        data = response.read().decode()
         conn.close()
-        obj = response, json.loads(data)
+
+        # https status code is not 200, raise Exception
+        if response.status != 200:
+            raise CoolsmsServerException(response.reason, response.status)
+
+        # response data parsing
+        obj = None
+        if data:
+            obj = json.loads(data)
+
         return obj
 
     # http POST request
     def request_post(self, resource, params=None):
-        timestamp, salt, signature = self.__get_signature__()
-        base_params = {'api_key': self.api_key, 'timestamp': timestamp, 'salt': salt,
-                       'signature': signature.hexdigest()}
-        if params:
-            base_params.update(params)
-        params_str = urlencode(base_params)
+        if params == None:
+            params = dict()
+
+        params = self.set_base_params(params)
+        params_str = urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
         conn.request("POST", "/sms/%s/%s" % (self.api_version, resource), params_str, headers)
         response = conn.getresponse()
-        data = response.read()
+        data = response.read().decode()
         conn.close()
-        json_obj = None
+
+        # https status code is not 200, raise Exception
+        if response.status != 200:
+            raise CoolsmsServerException(response.reason, response.status)
+
+        obj = None
         if data:
-            json_obj = json.loads(data)
-        return response, json_obj
+            obj = json.loads(data)
+
+        return obj
 
     # send multipart form to the server
-    def request_post_multipart(host, selector, fields, files):
-        content_type, body = encode_multipart_formdata(fields, files)
-        h = HTTPSConnection(host)
-        h.putrequest('POST', selector)
-        h.putheader('content-type', content_type)
-        h.putheader('content-length', str(len(body.encode('utf-8'))))
-        h.putheader('User-Agent', 'sms-python')
-        h.endheaders()
-        h.send(body.encode('utf-8'))
-        resp = h.getresponse()
-        return resp.status, resp. reason, resp.read().decode()
+    def request_post_multipart(self, resource, params, files):
+        host = self.host + ':' + str(self.port)
+        selector = "/sms/%s/%s" % (self.api_version, resource)
+
+        params = self.set_base_params(params)
+        content_type, body = self.encode_multipart_formdata(params, files)
+        conn = HTTPSConnection(host)
+        conn.putrequest('POST', selector)
+        conn.putheader('content-type', content_type)
+        conn.putheader('content-length', str(len(body.encode('utf-8'))))
+        conn.putheader('User-Agent', 'sms-python')
+        conn.endheaders()
+        conn.send(body.encode('utf-8'))
+        response = conn.getresponse()
+        data = response.read().decode()
+        conn.close()
+
+        # https status code is not 200, raise Exception
+        if response.status != 200:
+            raise CoolsmsServerException(response.reason, response.status)
+
+        # response data parsing
+        obj = None
+        if data:
+            obj = json.loads(data)
+
+        return obj
 
     # format multipart form
-    def encode_multipart_formdata(fields, files):
+    def encode_multipart_formdata(self, fields, files):
         boundary = str(uuid.uuid1())
         crlf = '\r\n'
         l = []
@@ -140,3 +174,11 @@ class Coolsms:
     # get content type
     def get_content_type(filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+
+    # set base parameter
+    def set_base_params(self, params):
+        timestamp, salt, signature = self.__get_signature__()
+        base_params = {'api_key': self.api_key, 'timestamp': timestamp, 'salt': salt,
+                       'signature': signature.hexdigest()}
+        params.update(base_params)
+        return params

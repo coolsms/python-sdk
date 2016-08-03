@@ -2,7 +2,9 @@
 # -*- coding: utf8 -*-
 
 class CoolsmsException(Exception):
-	pass
+    def __init__(self, message, code):
+        self.code = code
+        self.msg = message
 
 class CoolsmsSDKException(CoolsmsException):
 	pass
