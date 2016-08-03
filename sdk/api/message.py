@@ -23,54 +23,32 @@ class Message:
     def __init__(self, api_key, api_secret):
         self.cool = Coolsms(api_key, api_secret)
 
-    ## @brief access to send resource
-    #  @param dictionary params [required]
+    ## @brief send messages ( HTTP Method POST )
+    #  @param dictionary params {
+    #  @param string to [required]
+    #  @param string from [required]
+    #  @param string text [required]
+    #  @param string type [optional]
+    #  @param mixed image [optional]
+    #  @param string image_encoding [optional]
+    #  @param string refname [optional]
+    #  @param mixed country [optional]
+    #  @param string datetime [optional]
+    #  @param string subject [optional]
+    #  @param string charset [optional]
+    #  @param string srk [optional]
+    #  @param string mode [optional]
+    #  @param string extension [optional]
+    #  @param integer delay [optional]
+    #  @param boolean force_sms [optional]
+    #  @param string app_version [optional] }
     #  @return JSONObject
     def send(self, params):
-        """Request to REST API server to send SMS messages
-
-        Arguments:
-            to : A comma seperated string which contains phone numbers.
-            from : sender number
-            text : Message content
-            type : one of sms, lms, mms
-            template_code : alimtalk template code
-            sender_key : alimtalk sender key
-            subject : If you send LMS or MMS, you should input the subject of the message(s).
-            image : Include image, when you send MMS.
-            datetime : Use this field when you send scheduled messages.
-            country : country code ( korea:82, japan:81 ... visit 'http://countrycode.org' )
-            
-            and more informations, visit 'http://www.coolsms.co.kr/SMS_API_v2#POSTsend'
-
-        Returns:
-            A JSON type string will be returned. On failure, raise Exception
-        """
         # params type check
         if type(params) is not dict:
             raise CoolsmsSDKException("parameter type is not dictionary", 201)
 
-        # require fields check
-        if all (k in params for k in ("to", "from", "text")) == False:
-            raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)
-
-        for key, val in params.items():
-            print("Code : {0}, Value : {1}".format(key, val))
-
-            if key == "text" and sys.version_info[0] == 2:
-                text = val
-                t_temp = text.decode('utf-8')
-                text = t_temp.encode('utf-8')
-                text = unicode(text, encoding='utf-8')
-                params['text'] = text
-
-            # convert list to a comma seperated string
-            if key == "to" and val == list:
-                to = ','.join(to)
-
-            # message type check
-            if key == "type" and val.lower() not in ['sms', 'lms', 'mms', 'ata']:
-                raise CoolsmsSDKException("message type is not supported", 201)
+        params = Coolsms.check_send_data(params)
 
         # system info
         params['os_platform'] = platform.system()
@@ -95,30 +73,48 @@ class Message:
         response = self.cool.request_post_multipart("send", params, files)
         return response
 
-    ## @brief access to statusresource
-    #  @param dictionary params [optional]
+    ## @brief get status ( HTTP Method GET )
+    #  @param dictionary params {
+    #  @param integer count [optional]
+    #  @param string unit [optional]
+    #  @param string date [optional]
+    #  @param integer channel [optional] }
     #  @return JSONObject
+    #  @throws CoolsmsException
     def status(self, params=None):
         response = self.cool.request_get('status', params)
         return response 
 
-    ## @brief access to status resource
-    #  @param dictionary params [optional]
+    ## @brief sent messages ( HTTP Method GET )
+    #  @param dictionary params {
+    #  @param integer offset [optional]
+    #  @param integer limit [optional]
+    #  @param string rcpt [optional]
+    #  @param string start [optional]
+    #  @param string end [optional]
+    #  @param string status [optional]
+    #  @param string status [optional]
+    #  @param string resultcode [optional]
+    #  @param string notin_resultcode [optional]
+    #  @param string message_id [optional]
+    #  @param string group_id [optional] }
     #  @return JSONObject
     def sent(self, params=None):
         response = self.cool.request_get('sent', params)
         return response 
 
-    ## @brief access to balance resource
-    #  @param dictionary params [optional]
-    #  @return JSONObject
+    ## @brief get remaining balance ( HTTP Method GET )
+    #  @param None
+    #  @return JSONobject
     def balance(self):
         response = self.cool.request_get('balance')
         return response
 
-    ## @brief access to cancel resource
-    #  @param dictionary params [optional]
-    #  @return JSONObject
+    ## @brief cancel reserve message. mid or gid either one must be entered. ( HTTP Method POST )
+    #  @param dictionary params {
+    #  @param string mid [optional]
+    #  @param string gid [optional] }
+    #  @return None
     def cancel(self, params):
         if 'message_id' not in params and 'group_id' not in params:
             raise CoolsmsSDKException("message_id or group_id either one must be entered", 201)
