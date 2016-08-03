@@ -10,6 +10,9 @@ import time
 import platform
 
 from hashlib import md5
+from sdk.exceptions import CoolsmsException
+from sdk.exceptions import CoolsmsSDKException
+from sdk.exceptions import CoolsmsSystemException
 from sdk.exceptions import CoolsmsServerException
 
 # sys.version_info.major is available in python version 2.7
@@ -82,7 +85,7 @@ class Coolsms:
             params = dict()
 
         params = self.set_base_params(params)
-        params_str = urlencode(base_params)
+        params_str = urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
@@ -203,4 +206,32 @@ class Coolsms:
         base_params = {'api_key': self.api_key, 'timestamp': timestamp, 'salt': salt,
                        'signature': signature.hexdigest()}
         params.update(base_params)
+        return params
+
+    ## @brief check send data
+    #  @param dictionary params [required]
+    #  @return dictionary params
+    def check_send_data(params):
+        # require fields check
+        if all (k in params for k in ("to", "from", "text")) == False:
+            raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)
+
+        for key, val in params.items():
+            print("Code : {0}, Value : {1}".format(key, val))
+
+            if key == "text" and sys.version_info[0] == 2:
+                text = val
+                t_temp = text.decode('utf-8')
+                text = t_temp.encode('utf-8')
+                text = unicode(text, encoding='utf-8')
+                params['text'] = text
+
+            # convert list to a comma seperated string
+            if key == "to" and val == list:
+                params['to'] = ','.join(to)
+
+            # message type check
+            if key == "type" and val.lower() not in ['sms', 'lms', 'mms', 'ata']:
+                raise CoolsmsSDKException("message type is not supported", 201)
+
         return params

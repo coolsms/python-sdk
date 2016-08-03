@@ -52,12 +52,13 @@ class Message:
 
         # require fields check
         if all (k in params for k in ("to", "from", "text")) == False:
-            raise CoolsmsSDKException("parameter 'to', 'from', 'text' is required", 201)
+            raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)
 
         for key, val in params.items():
             print("Code : {0}, Value : {1}".format(key, val))
 
             if key == "text" and sys.version_info[0] == 2:
+                text = val
                 t_temp = text.decode('utf-8')
                 text = t_temp.encode('utf-8')
                 text = unicode(text, encoding='utf-8')
@@ -120,7 +121,7 @@ class Message:
     #  @return JSONObject
     def cancel(self, params):
         if 'message_id' not in params and 'group_id' not in params:
-            raise CoolsmsSDKException("message_id or group_id either one must be entered", 202)
+            raise CoolsmsSDKException("message_id or group_id either one must be entered", 201)
 
         response = self.cool.request_post('cancel', params)
         return response
