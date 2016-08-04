@@ -58,7 +58,7 @@ class Message:
         # type이 mms일때 image file check
         files = {}
         if 'type' in params and params['type'] == 'mms':
-            if params['image'] is None:
+            if 'image' not in params:
                 raise CoolsmsSDKException('image file is required')
 
             try:
@@ -67,7 +67,7 @@ class Message:
             except Exception as e:
                 raise CoolsmsSystemException(e, 399)
 
-            files = {'image': {'filename': image, 'content': content}}
+            files = {'image': {'filename': params['image'], 'content': content}}
 
         # request post multipart-form
         response = self.cool.request_post_multipart("send", params, files)

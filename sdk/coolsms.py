@@ -158,10 +158,10 @@ class Coolsms:
         conn = HTTPSConnection(host)
         conn.putrequest('POST', selector)
         conn.putheader('content-type', content_type)
-        conn.putheader('content-length', str(len(body.encode('utf-8'))))
+        conn.putheader('content-length', str(len(body)))
         conn.putheader('User-Agent', 'sms-python')
         conn.endheaders()
-        conn.send(body.encode('utf-8'))
+        conn.send(body)
         response = conn.getresponse()
         data = response.read().decode()
         conn.close()
@@ -194,23 +194,51 @@ class Coolsms:
             l.append('Content-Disposition: form-data; name="%s"' % key)
             l.append('')
             l.append(value)
-        l.append('')
-        body = crlf.join(l)
+
         for key, value in files.items():
-            body += '--' + boundary + crlf
-            body += 'Content-Type: %s' % get_content_type(value['filename']) + crlf
-            body += 'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']) + crlf
-            body += crlf
-            body = body.encode('utf-8') + value['content'] + crlf
-        body += '--' + boundary + '--' + crlf
-        body += crlf
+
+            print(self.get_content_type(value['filename']))
+            l.append('--' + boundary)
+            l.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']))
+            l.append('Content-Type: %s' % self.get_content_type(value['filename']))
+
+            print(type(value['content']))
+            l.append('')
+            l.append(str(value['content']))
+
+        l.append('--' + boundary + '--')
+        l.append('')
+        
+        body = crlf.join(l).encode('utf-8')
+        """
+        body = body.encode('utf-8')
+
+        print("WOW")
+        for key, value in files.items():
+            print(self.get_content_type(value['filename']))
+            image_data = '--' + boundary + crlf
+            image_data += 'Content-Type: %s' % self.get_content_type(value['filename']) + crlf
+            image_data += 'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']) + crlf
+            image_data += crlf
+            image_data = image_data.encode('utf-8')
+
+            body += image_data
+            body += value['content']
+
+        end_data = crlf + '--' + boundary + '--' + crlf
+        end_data += crlf
+        end_data = end_data.encode('utf-8')
+        body += end_data
+        """
+
         content_type = 'multipart/form-data; boundary=%s' % boundary
+
         return content_type, body    
     
     ## @brief get content type
     #  @param string filesname [required]
     #  @return string content_type
-    def get_content_type(filename):
+    def get_content_type(self, filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
     ## @brief set base parameter
