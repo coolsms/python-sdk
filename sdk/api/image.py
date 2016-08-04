@@ -5,7 +5,10 @@ import sys
 sys.path.insert(0, "../../")
 
 from sdk.coolsms import Coolsms
-from sdk import exceptions
+from sdk.exceptions import CoolsmsException
+from sdk.exceptions import CoolsmsSDKException
+from sdk.exceptions import CoolsmsSystemException
+from sdk.exceptions import CoolsmsServerException
 
 # class Image
 class Image:

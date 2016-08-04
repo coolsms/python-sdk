@@ -58,6 +58,9 @@ class Coolsms:
     # API Secret
     api_secret = None
 
+    # API Name
+    api_name = "sms"
+
     # error handle
     error_string = None
 
@@ -89,14 +92,18 @@ class Coolsms:
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
-        conn.request("GET", "/sms/%s/%s?" % (self.api_version, resource) + params_str, None, headers)
+        conn.request("GET", "/%s/%s/%s?" % (self.api_name, self.api_version, resource) + params_str, None, headers)
         response = conn.getresponse()
         data = response.read().decode()
         conn.close()
 
         # https status code is not 200, raise Exception
         if response.status != 200:
-            raise CoolsmsServerException(response.reason, response.status)
+            error_msg = response.reason
+            if(data):
+                error_msg = data
+            
+            raise CoolsmsServerException(error_msg, response.status)
 
         # response data parsing
         obj = None
@@ -118,14 +125,18 @@ class Coolsms:
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
-        conn.request("POST", "/sms/%s/%s" % (self.api_version, resource), params_str, headers)
+        conn.request("POST", "/%s/%s/%s" % (self.api_name, self.api_version, resource), params_str, headers)
         response = conn.getresponse()
         data = response.read().decode()
         conn.close()
 
         # https status code is not 200, raise Exception
         if response.status != 200:
-            raise CoolsmsServerException(response.reason, response.status)
+            error_msg = response.reason
+            if(data):
+                error_msg = data
+            
+            raise CoolsmsServerException(error_msg, response.status)
 
         obj = None
         if data:
@@ -140,7 +151,7 @@ class Coolsms:
     #  @return JSONObject
     def request_post_multipart(self, resource, params, files):
         host = self.host + ':' + str(self.port)
-        selector = "/sms/%s/%s" % (self.api_version, resource)
+        selector = "/%s/%s/%s" % (self.api_name, self.api_version, resource)
 
         params = self.set_base_params(params)
         content_type, body = self.encode_multipart_formdata(params, files)
@@ -157,7 +168,11 @@ class Coolsms:
 
         # https status code is not 200, raise Exception
         if response.status != 200:
-            raise CoolsmsServerException(response.reason, response.status)
+            error_msg = response.reason
+            if(data):
+                error_msg = data
+            
+            raise CoolsmsServerException(error_msg, response.status)
 
         # response data parsing
         obj = None
@@ -235,3 +250,10 @@ class Coolsms:
                 raise CoolsmsSDKException("message type is not supported", 201)
 
         return params
+
+    ## @brief set api name and api version
+    #  @param string api_name [required] 'sms', 'senderid', 'image'
+    #  @param integer api_version [required]
+    def set_api_config(self, api_name, api_version):
+        self.api_name = api_name;
+        self.api_version = api_version;
