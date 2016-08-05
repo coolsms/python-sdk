@@ -237,8 +237,6 @@ class Coolsms:
             raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)
 
         for key, val in params.items():
-            print("Code : {0}, Value : {1}".format(key, val))
-
             if key == "text" and sys.version_info[0] == 2:
                 text = val
                 t_temp = text.decode('utf-8')
