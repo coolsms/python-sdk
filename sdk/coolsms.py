@@ -154,11 +154,12 @@ class Coolsms:
         selector = "/%s/%s/%s" % (self.api_name, self.api_version, resource)
 
         params = self.set_base_params(params)
+
         content_type, body = self.encode_multipart_formdata(params, files)
         conn = HTTPSConnection(host)
         conn.putrequest('POST', selector)
-        conn.putheader('content-type', content_type)
-        conn.putheader('content-length', str(len(body)))
+        conn.putheader('Content-type', content_type)
+        conn.putheader('Content-length', str(len(body)))
         conn.putheader('User-Agent', 'sms-python')
         conn.endheaders()
         conn.send(body)
@@ -188,6 +189,7 @@ class Coolsms:
     def encode_multipart_formdata(self, params, files):
         boundary = str(uuid.uuid1())
         crlf = '\r\n'
+
         l = []
         for key, value in params.items():
             l.append('--' + boundary)
@@ -196,41 +198,16 @@ class Coolsms:
             l.append(value)
 
         for key, value in files.items():
-
-            print(self.get_content_type(value['filename']))
             l.append('--' + boundary)
             l.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']))
             l.append('Content-Type: %s' % self.get_content_type(value['filename']))
-
-            print(type(value['content']))
             l.append('')
             l.append(str(value['content']))
 
         l.append('--' + boundary + '--')
         l.append('')
-        
         body = crlf.join(l).encode('utf-8')
-        """
-        body = body.encode('utf-8')
-
-        print("WOW")
-        for key, value in files.items():
-            print(self.get_content_type(value['filename']))
-            image_data = '--' + boundary + crlf
-            image_data += 'Content-Type: %s' % self.get_content_type(value['filename']) + crlf
-            image_data += 'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']) + crlf
-            image_data += crlf
-            image_data = image_data.encode('utf-8')
-
-            body += image_data
-            body += value['content']
-
-        end_data = crlf + '--' + boundary + '--' + crlf
-        end_data += crlf
-        end_data = end_data.encode('utf-8')
-        body += end_data
-        """
-
+        
         content_type = 'multipart/form-data; boundary=%s' % boundary
 
         return content_type, body    

@@ -3,6 +3,7 @@
 
 import sys
 import platform
+import base64
 sys.path.insert(0, "../../")
 
 from sdk.coolsms import Coolsms
@@ -63,11 +64,12 @@ class Message:
 
             try:
                 with open(params['image'], 'rb') as content_file:
-                    content = content_file.read()
+                    content = base64.b64encode(content_file.read())
+                    content = content.decode()
             except Exception as e:
                 raise CoolsmsSystemException(e, 399)
-
             files = {'image': {'filename': params['image'], 'content': content}}
+            params['image_encoding'] = 'base64'
 
         # request post multipart-form
         response = self.cool.request_post_multipart("send", params, files)

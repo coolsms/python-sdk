@@ -2,6 +2,7 @@
 # -*- coding: utf8 -*-
 
 import sys
+import base64
 sys.path.insert(0, "../../")
 
 from sdk.coolsms import Coolsms
@@ -53,25 +54,22 @@ class Image:
 
     # @brief upload image ( HTTP Method POST )
     # @param string image [required]
-    # @param string encoding [optional] 
     # @return JSONobject
-    def upload_image(self, image, encoding=None):
+    def upload_image(self, image):
         if image == None:
             raise CoolsmsSDKException("'image' is required", 201);
 
         params = dict()
         params = {'image':image}
-        if encoding:
-            params['encoding'] = encoding
+        params['image_encoding'] = 'base64'
 
         files = {}
-
         try:
-            with open(params['image'], 'rb') as content_file:
-                content = content_file.read()
+            with open(image, 'rb') as content_file:
+                content = base64.b64encode(content_file.read())
+                content = content.decode()
         except Exception as e:
             raise CoolsmsSystemException(e, 399)
-
         files = {'image': {'filename': image, 'content': content}}
 
         response = self.cool.request_post_multipart("upload_image", params, files)

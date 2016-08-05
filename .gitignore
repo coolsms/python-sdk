@@ -1,4 +1,5 @@
-coolsms.pyc
+*.pyc
 */.idea/*
 */__pycache__
 test.py
+test.jpg
