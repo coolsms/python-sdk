@@ -36,8 +36,8 @@ class GroupMessage:
     #  @param string sdk_version [optional]
     #  @param string app_version [optional] }
     #  @return JSONObject
-    def create_group(self):
-        response = self.cool.request_get('new_group')
+    def create_group(self, params=None):
+        response = self.cool.request_get('new_group', params)
 
         return response
 

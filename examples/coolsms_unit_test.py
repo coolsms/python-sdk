@@ -115,7 +115,7 @@ class CoolsmsUnitTest(unittest.TestCase):
 
         ## send 
         try:
-            cool.send(params)
+            cool.send(group_id)
         except CoolsmsException as e:
             # 402는 잔액부족이기 때문에 테스트 실패사유가 안됨
             if e.code == 402:
