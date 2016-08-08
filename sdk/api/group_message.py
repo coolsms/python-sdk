@@ -95,7 +95,7 @@ class GroupMessage:
         if "group_id" not in params:
             raise CoolsmsSDKException("parameter 'group_id' is required", 201)
 
-        params = Coolsms.check_send_data(params)
+        params = self.cool.check_send_data(params)
 
         # system info
         params['os_platform'] = platform.system()
@@ -129,7 +129,7 @@ class GroupMessage:
         messages = json.loads(messages)
 
         for data in messages:
-            data = Coolsms.check_send_data(data)
+            data = self.cool.check_send_data(data)
 
         # messages setting
         params = dict()

@@ -231,7 +231,7 @@ class Coolsms:
     ## @brief check send data
     #  @param dictionary params [required]
     #  @return dictionary params
-    def check_send_data(params):
+    def check_send_data(self, params):
         # require fields check
         if all (k in params for k in ("to", "from", "text")) == False:
             raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)

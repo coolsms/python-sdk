@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 # vi:set sw=4 ts=4 expandtab:
 
 import sys
