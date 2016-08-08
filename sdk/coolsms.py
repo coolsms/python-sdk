@@ -58,6 +58,9 @@ class Coolsms:
     # API Secret
     api_secret = None
 
+    # API Name
+    api_name = "sms"
+
     # error handle
     error_string = None
 
@@ -89,14 +92,18 @@ class Coolsms:
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
-        conn.request("GET", "/sms/%s/%s?" % (self.api_version, resource) + params_str, None, headers)
+        conn.request("GET", "/%s/%s/%s?" % (self.api_name, self.api_version, resource) + params_str, None, headers)
         response = conn.getresponse()
         data = response.read().decode()
         conn.close()
 
         # https status code is not 200, raise Exception
         if response.status != 200:
-            raise CoolsmsServerException(response.reason, response.status)
+            error_msg = response.reason
+            if(data):
+                error_msg = data
+            
+            raise CoolsmsServerException(error_msg, response.status)
 
         # response data parsing
         obj = None
@@ -118,14 +125,18 @@ class Coolsms:
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
         conn = HTTPSConnection(self.host, self.port)
-        conn.request("POST", "/sms/%s/%s" % (self.api_version, resource), params_str, headers)
+        conn.request("POST", "/%s/%s/%s" % (self.api_name, self.api_version, resource), params_str, headers)
         response = conn.getresponse()
         data = response.read().decode()
         conn.close()
 
         # https status code is not 200, raise Exception
         if response.status != 200:
-            raise CoolsmsServerException(response.reason, response.status)
+            error_msg = response.reason
+            if(data):
+                error_msg = data
+            
+            raise CoolsmsServerException(error_msg, response.status)
 
         obj = None
         if data:
@@ -140,24 +151,29 @@ class Coolsms:
     #  @return JSONObject
     def request_post_multipart(self, resource, params, files):
         host = self.host + ':' + str(self.port)
-        selector = "/sms/%s/%s" % (self.api_version, resource)
+        selector = "/%s/%s/%s" % (self.api_name, self.api_version, resource)
 
         params = self.set_base_params(params)
+
         content_type, body = self.encode_multipart_formdata(params, files)
         conn = HTTPSConnection(host)
         conn.putrequest('POST', selector)
-        conn.putheader('content-type', content_type)
-        conn.putheader('content-length', str(len(body.encode('utf-8'))))
+        conn.putheader('Content-type', content_type)
+        conn.putheader('Content-length', str(len(body)))
         conn.putheader('User-Agent', 'sms-python')
         conn.endheaders()
-        conn.send(body.encode('utf-8'))
+        conn.send(body)
         response = conn.getresponse()
         data = response.read().decode()
         conn.close()
 
         # https status code is not 200, raise Exception
         if response.status != 200:
-            raise CoolsmsServerException(response.reason, response.status)
+            error_msg = response.reason
+            if(data):
+                error_msg = data
+            
+            raise CoolsmsServerException(error_msg, response.status)
 
         # response data parsing
         obj = None
@@ -173,29 +189,33 @@ class Coolsms:
     def encode_multipart_formdata(self, params, files):
         boundary = str(uuid.uuid1())
         crlf = '\r\n'
+
         l = []
         for key, value in params.items():
             l.append('--' + boundary)
             l.append('Content-Disposition: form-data; name="%s"' % key)
             l.append('')
             l.append(value)
-        l.append('')
-        body = crlf.join(l)
+
         for key, value in files.items():
-            body += '--' + boundary + crlf
-            body += 'Content-Type: %s' % get_content_type(value['filename']) + crlf
-            body += 'Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']) + crlf
-            body += crlf
-            body = body.encode('utf-8') + value['content'] + crlf
-        body += '--' + boundary + '--' + crlf
-        body += crlf
+            l.append('--' + boundary)
+            l.append('Content-Disposition: form-data; name="%s"; filename="%s"' % (key, value['filename']))
+            l.append('Content-Type: %s' % self.get_content_type(value['filename']))
+            l.append('')
+            l.append(str(value['content']))
+
+        l.append('--' + boundary + '--')
+        l.append('')
+        body = crlf.join(l).encode('utf-8')
+        
         content_type = 'multipart/form-data; boundary=%s' % boundary
+
         return content_type, body    
     
     ## @brief get content type
     #  @param string filesname [required]
     #  @return string content_type
-    def get_content_type(filename):
+    def get_content_type(self, filename):
         return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
     ## @brief set base parameter
@@ -217,8 +237,6 @@ class Coolsms:
             raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)
 
         for key, val in params.items():
-            print("Code : {0}, Value : {1}".format(key, val))
-
             if key == "text" and sys.version_info[0] == 2:
                 text = val
                 t_temp = text.decode('utf-8')
@@ -235,3 +253,10 @@ class Coolsms:
                 raise CoolsmsSDKException("message type is not supported", 201)
 
         return params
+
+    ## @brief set api name and api version
+    #  @param string api_name [required] 'sms', 'senderid', 'image'
+    #  @param integer api_version [required]
+    def set_api_config(self, api_name, api_version):
+        self.api_name = api_name;
+        self.api_version = api_version;
