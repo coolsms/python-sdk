@@ -25,7 +25,7 @@ if __name__ == "__main__":
         print("Success Count : %s" % response['success_count'])
         print("Error Count : %s" % response['error_count'])
 
-        if response['error_list']:
+        if "error_list" in response:
             print("Error List : %s" % response['error_list'])
 
     except CoolsmsException as e:
