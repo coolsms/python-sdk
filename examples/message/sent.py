@@ -8,7 +8,7 @@ sys.path.insert(0, "../../")
 from sdk.api.message import Message
 from sdk.exceptions import CoolsmsException
 
-##  @brief This sample code demonstrate how to check sms result through CoolSMS Rest API PHP
+##  @brief This sample code demonstrate how to check sms result through CoolSMS Rest API
 if __name__ == "__main__":
 
     # set api key, api secret
