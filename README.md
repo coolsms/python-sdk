@@ -8,7 +8,7 @@ v2.0
 
 ## License
 
-MIT License
+GPL v2 License
 
 ## Installation
 
