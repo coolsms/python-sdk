@@ -2,6 +2,10 @@
 
 Send Message & Message Management using Python and REST API.
 
+## Version
+
+v2.0
+
 ## License
 
 MIT License
