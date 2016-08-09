@@ -8,7 +8,7 @@ v2.0
 
 ## License
 
-GPL v2 License
+BSD License
 
 ## Installation
 
