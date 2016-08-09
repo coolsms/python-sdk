@@ -2,12 +2,93 @@
 
 Send Message & Message Management using Python and REST API.
 
+## License
+
+MIT License
+
 ## Installation
 
 - Package install url ( source code & examples ) : http://www.coolsms.co.kr/download/545387
 
 - Github : https://github.com/coolsms/python-sdk
 
-## Usage
+## Usage 
 
-Look at the 'http://www.coolsms.co.kr/PYTHON_SDK_Example'.
+```python
+	### Send Message
+	from sdk.api.message import Message
+	from sdk.exceptions import CoolsmsException
+
+	# set api key, api secret
+    api_key = "#ENTER_YOUR_OWN#"
+    api_secret = "#ENTER_YOUR_OWN#"
+
+    ## 4 params(to, from, type, text) are mandatory. must be filled
+    params = dict()
+    params['type'] = 'sms' # Message type ( sms, lms, mms, ata )
+    params['to'] = '01000000000' # Recipients Number '01000000000,01000000001'
+    params['from'] = '01000000000' # Sender number
+    params['text'] = 'Test Message' # Message
+
+	cool = Message(api_key, api_secret)
+    try:
+        response = cool.send(params)
+        print("Success Count : %s" % response['success_count'])
+        print("Error Count : %s" % response['error_count'])
+        print("Group ID : %s" % response['group_id'])
+
+        if "error_list" in response:
+            print("Error List : %s" % response['error_list'])
+
+    except CoolsmsException as e:
+        print("Error Code : %s" % e.code)
+        print("Error Message : %s" % e.msg)
+
+	# set api key, api secret
+    api_key = "#ENTER_YOUR_OWN#"
+    api_secret = "#ENTER_YOUR_OWN#"
+
+    # 4 params(to, from, type, text) are mandatory. must be filled
+    params = dict()
+    # params["messaage_id"] = "M52CB443257C61" # message id
+    # params["group_id"] = "G52CB4432576C8" # group id
+    # params["offset"] = "0" # default 0
+    # params["limit"] = "1" # default 20
+    # params["rcpt"] = "01000000000" # search sent result by recipient number 
+    # params["start"] = "201601070915" # set search start date 
+    # params["end"] = "201601071230" # set search end date
+	
+	### Message History
+	from sdk.api.message import Message
+	from sdk.exceptions import CoolsmsException
+
+    cool = Message(api_key, api_secret)
+    try:
+        i = 0
+        response = cool.sent()
+        for data in response['data']:
+            i += 1
+            print("Message No.%s" % i)
+            print("Type : %s" % data['type'])
+            print("Accepted_time : %s" % data['accepted_time'])
+            print("Recipient_number : %s" % data['recipient_number'])
+            print("Group_id : %s" % data['group_id'])
+            print("Message_id : %s" % data['message_id'])
+            print("Status : %s" % data['status'])
+            print("Result_code : %s" % data['result_code'])
+            print("Result_message : %s" % data['result_message'])
+            print("Sent_time : %s" % data['sent_time'])
+            print("Text : %s" % data['text'])
+            print("Carrier : %s" % data['carrier'])
+            print("Scheduled_time : %s" % data['scheduled_time'])
+
+    except CoolsmsException as e:
+        print("Error Code : %s" % e.code)
+        print("Error Message : %s" % e.msg)
+
+	### ...more examples.. visit 'http://www.coolsms.co.kr/PYTHON_SDK_Example'
+```
+
+## Information
+
+Look at the 'http://www.coolsms.co.kr/PYTHON_SDK_Start_here'

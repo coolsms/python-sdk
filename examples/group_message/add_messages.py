@@ -17,13 +17,13 @@ if __name__ == "__main__":
 
     # Options(group_id, to, from, text) are mandatory. must be filled
     params = dict()
-    params["to"] = "01000000000"
-    params["from"] = "01000000000"
-    params["text"] = "Test Message"
+    params["type"] = "sms" # Message type ( sms, lms, mms, ata )
+    params['to'] = '01000000000' # Recipients Number '01000000000,01000000001'
+    params['from'] = '01000000000' # Sender number
+    params['text'] = 'Test Message' # Message
     params["group_id"] = "GID57A82D462CBBF" # Group ID
 
     # Optional parameters for your own needs
-    # params["type"] = "SMS" # Message type ( SMS, LMS, MMS, ATA )
     # params["image_id"] = "image_id" # image_id. type must be set as 'MMS'
     # params["refname"] = "" # Reference name
     # params["country"] = "82" # Korea(82) Japan(81) America(1) China(86) Default is Korea

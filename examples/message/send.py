@@ -17,14 +17,13 @@ if __name__ == "__main__":
 
     ## 4 params(to, from, type, text) are mandatory. must be filled
     params = dict()
-    params['type'] = 'sms'
-    params['to'] = '01000000000'
-    params['from'] = '01000000000'
-    params['text'] = 'Test Message'
+    params['type'] = 'sms' # Message type ( sms, lms, mms, ata )
+    params['to'] = '01000000000' # Recipients Number '01000000000,01000000001'
+    params['from'] = '01000000000' # Sender number
+    params['text'] = 'Test Message' # Message
 
     # Optional parameters for your own needs. more informations visit to http://www.coolsms.co.kr/SMS_API_v2#POSTsend
     # params["image"] = "desert.jpg" # image for MMS. type must be set as "MMS"
-    # params["image_encoding"] = "binary" # image encoding binary(default), base64 
     # params["mode"] = "test" # 'test' 모드. 실제로 발송되지 않으며 전송내역에 60 오류코드로 뜹니다. 차감된 캐쉬는 다음날 새벽에 충전 됩니다.
     # params["delay"] = "10" # 0~20사이의 값으로 전송지연 시간을 줄 수 있습니다.
     # params["force_sms"] = "true" # 푸시 및 알림톡 이용시에도 강제로 SMS로 발송되도록 할 수 있습니다.
@@ -45,6 +44,10 @@ if __name__ == "__main__":
         print("Success Count : %s" % response['success_count'])
         print("Error Count : %s" % response['error_count'])
         print("Group ID : %s" % response['group_id'])
+
+        if "error_list" in response:
+            print("Error List : %s" % response['error_list'])
+
     except CoolsmsException as e:
         print("Error Code : %s" % e.code)
         print("Error Message : %s" % e.msg)
