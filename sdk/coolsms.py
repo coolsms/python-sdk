@@ -31,7 +31,7 @@ else:
 #      - 설명 : Coolsms REST API 를 이용 보다 빠르고 안전하게 문자메시지를 보낼 수 있는 PYTHON으로 만들어진 SDK 입니다.
 #  @section CreateInfo 작성 정보
 #      - 작성자 : Nurigo
-#      - 작성일 : 2016/05/13 * 
+#      - 작성일 : 2016/08/09
 #  @section common 기타 정보
 #      - 저작권 GPL v2
 #      - Copyright (C) 2008-2016 NURIGO
@@ -231,7 +231,7 @@ class Coolsms:
     ## @brief check send data
     #  @param dictionary params [required]
     #  @return dictionary params
-    def check_send_data(params):
+    def check_send_data(self, params):
         # require fields check
         if all (k in params for k in ("to", "from", "text")) == False:
             raise CoolsmsSDKException("parameter 'to', 'from', 'text' are required", 201)

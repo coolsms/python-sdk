@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 # vi:set sw=4 ts=4 expandtab:
 
 import sys
@@ -20,8 +21,8 @@ def makeSuite(testcase,tests):
 #  @brief Coolsms Python SDK Unit Test
 class CoolsmsUnitTest(unittest.TestCase):
 
-    api_key = "NCS57A43A134D2B9"
-    api_secret = "9BF07E949C74516A70D7C6A4D6B2B0D3"
+    api_key = "#ENTER_YOUR_OWN#"
+    api_secret = "#ENTER_YOUR_OWN#"
 
     def setUp(self):
         pass
@@ -114,7 +115,7 @@ class CoolsmsUnitTest(unittest.TestCase):
 
         ## send 
         try:
-            cool.send(params)
+            cool.send(group_id)
         except CoolsmsException as e:
             # 402는 잔액부족이기 때문에 테스트 실패사유가 안됨
             if e.code == 402:

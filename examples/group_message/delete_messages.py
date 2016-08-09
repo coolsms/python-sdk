@@ -5,29 +5,26 @@ import sys
 
 sys.path.insert(0, "../../")
 
-from sdk.api.message import Message
+from sdk.api.group_message import GroupMessage
 from sdk.exceptions import CoolsmsException
 
-##  @brief This sample code demonstrate how to send sms through CoolSMS Rest API PHP
+##  @brief This sample code demonstrate how to delete messages through CoolSMS Rest API
 if __name__ == "__main__":
 
     # set api key, api secret
     api_key = "#ENTER_YOUR_OWN#"
     api_secret = "#ENTER_YOUR_OWN#"
 
-    ## 4 params(to, from, type, text) are mandatory. must be filled
-    params = dict()
-    params['type'] = 'lms' # Message type ( sms, lms, mms, ata )
-    params['to'] = '01000000000' # Recipients Number '01000000000,01000000001'
-    params['from'] = '01000000000' # Sender number
-    params['text'] = 'LMS Message Until 2000 byte' # Message
+    # group_id, message_ids are mandatory.
+    group_id = "GID57A82D462CBBF" # Group ID
+    message_ids = "MID2738AWQIEQQ" # Message IDs "MID29EII1913,MID1839231REE ..."
 
-    cool = Message(api_key, api_secret)
+    cool = GroupMessage(api_key, api_secret)
+
     try:
-        response = cool.send(params)
+        response = cool.delete_messages(group_id, message_ids)
         print("Success Count : %s" % response['success_count'])
         print("Error Count : %s" % response['error_count'])
-        print("Group ID : %s" % response['group_id'])
 
         if "error_list" in response:
             print("Error List : %s" % response['error_list'])

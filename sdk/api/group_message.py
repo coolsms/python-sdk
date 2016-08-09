@@ -36,8 +36,8 @@ class GroupMessage:
     #  @param string sdk_version [optional]
     #  @param string app_version [optional] }
     #  @return JSONObject
-    def create_group(self):
-        response = self.cool.request_get('new_group')
+    def create_group(self, params=None):
+        response = self.cool.request_get('new_group', params)
 
         return response
 
@@ -95,7 +95,7 @@ class GroupMessage:
         if "group_id" not in params:
             raise CoolsmsSDKException("parameter 'group_id' is required", 201)
 
-        params = Coolsms.check_send_data(params)
+        params = self.cool.check_send_data(params)
 
         # system info
         params['os_platform'] = platform.system()
@@ -129,7 +129,7 @@ class GroupMessage:
         messages = json.loads(messages)
 
         for data in messages:
-            data = Coolsms.check_send_data(data)
+            data = self.cool.check_send_data(data)
 
         # messages setting
         params = dict()

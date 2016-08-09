@@ -17,10 +17,14 @@ if __name__ == "__main__":
 
     ## 4 params(to, from, type, text) are mandatory. must be filled
     params = dict()
-    params['type'] = 'lms' # Message type ( sms, lms, mms, ata )
+    params['type'] = 'ata' # Message type ( sms, lms, mms, ata )
     params['to'] = '01000000000' # Recipients Number '01000000000,01000000001'
     params['from'] = '01000000000' # Sender number
-    params['text'] = 'LMS Message Until 2000 byte' # Message
+    params["sender_key"] = "#ENTER_YOUR_SENDER_KEY#" # 알림톡 사용을 위해 필요합니다. 신청방법 : http://www.coolsms.co.kr/AboutAlimTalk
+    params["template_code"] = "#ENTER_YOUR_TEMPLATE_CODE#" # 알림톡 template code 입니다. 자세한 설명은 http://www.coolsms.co.kr/AboutAlimTalk을 참조해주세요. 
+
+    # 알림톡에서 메시지내용은 Template Code에 맞는 메시지 내용이어야 하며 '#{홍길동}'과 같은 변수들은 다른 String으로 대체가 가능합니다.
+    params['text'] = '#{홍길동}님이 #{게시판}에 새로운 게시물을 등록하였습니다.' 
 
     cool = Message(api_key, api_secret)
     try:

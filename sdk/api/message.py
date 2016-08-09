@@ -49,7 +49,7 @@ class Message:
         if type(params) is not dict:
             raise CoolsmsSDKException("parameter type is not dictionary", 201)
 
-        params = Coolsms.check_send_data(params)
+        params = self.cool.check_send_data(params)
 
         # system info
         params['os_platform'] = platform.system()
