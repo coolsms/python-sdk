@@ -14,8 +14,8 @@ MIT License
 
 ## Usage 
 
+Send Message
 ```python
-	### Send Message
 	from sdk.api.message import Message
 	from sdk.exceptions import CoolsmsException
 
@@ -43,24 +43,16 @@ MIT License
     except CoolsmsException as e:
         print("Error Code : %s" % e.code)
         print("Error Message : %s" % e.msg)
+```
+
+Message History
+```python
+	from sdk.api.message import Message
+	from sdk.exceptions import CoolsmsException
 
 	# set api key, api secret
     api_key = "#ENTER_YOUR_OWN#"
     api_secret = "#ENTER_YOUR_OWN#"
-
-    # 4 params(to, from, type, text) are mandatory. must be filled
-    params = dict()
-    # params["messaage_id"] = "M52CB443257C61" # message id
-    # params["group_id"] = "G52CB4432576C8" # group id
-    # params["offset"] = "0" # default 0
-    # params["limit"] = "1" # default 20
-    # params["rcpt"] = "01000000000" # search sent result by recipient number 
-    # params["start"] = "201601070915" # set search start date 
-    # params["end"] = "201601071230" # set search end date
-	
-	### Message History
-	from sdk.api.message import Message
-	from sdk.exceptions import CoolsmsException
 
     cool = Message(api_key, api_secret)
     try:
@@ -85,9 +77,9 @@ MIT License
     except CoolsmsException as e:
         print("Error Code : %s" % e.code)
         print("Error Message : %s" % e.msg)
-
-	### ...more examples.. visit 'http://www.coolsms.co.kr/PYTHON_SDK_Example'
 ```
+
+visit to 'http://www.coolsms.co.kr/PYTHON_SDK_Example'.
 
 ## Information
 
