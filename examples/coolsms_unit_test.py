@@ -21,8 +21,8 @@ def makeSuite(testcase,tests):
 #  @brief Coolsms Python SDK Unit Test
 class CoolsmsUnitTest(unittest.TestCase):
 
-    api_key = "NCS57A43A134D2B9"
-    api_secret = "9BF07E949C74516A70D7C6A4D6B2B0D3"
+    api_key = "#ENTER_YOUR_OWN#"
+    api_secret = "#ENTER_YOUR_OWN#"
 
     def setUp(self):
         pass
