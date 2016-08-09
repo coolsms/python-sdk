@@ -79,7 +79,7 @@ MIT License
         print("Error Message : %s" % e.msg)
 ```
 
-visit to 'http://www.coolsms.co.kr/PYTHON_SDK_Example'.
+If you want more examples. Visit to 'http://www.coolsms.co.kr/PYTHON_SDK_Example'.
 
 ## Information
 
