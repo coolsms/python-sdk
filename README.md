@@ -14,7 +14,7 @@ MIT License
 
 ## Usage 
 
-Send Message
+### Send Message
 ```python
 	from sdk.api.message import Message
 	from sdk.exceptions import CoolsmsException
@@ -45,7 +45,7 @@ Send Message
         print("Error Message : %s" % e.msg)
 ```
 
-Message History
+### Message History
 ```python
 	from sdk.api.message import Message
 	from sdk.exceptions import CoolsmsException
