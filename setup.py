@@ -5,7 +5,7 @@ except ImportError:
  
 setup(
     name='coolsms_python_sdk',
-    version='2.0', 
+    version='2.0.1', 
     packages=['sdk', 'sdk/api'], 
 	package_dir={'sdk': 'sdk', 'api': 'sdk/api'},
     license='BSD License',
