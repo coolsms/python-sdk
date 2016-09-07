@@ -34,21 +34,25 @@ class Message:
     #  @param string to [required]
     #  @param string from [required]
     #  @param string text [required]
-    #  @param string type [optional]
+    #  @param string type [optional] [default:"sms"]
     #  @param mixed image [optional]
     #  @param string image_encoding [optional]
     #  @param string refname [optional]
-    #  @param mixed country [optional]
+    #  @param mixed country [optional] [default:"82"]
     #  @param string datetime [optional]
     #  @param string subject [optional]
-    #  @param string charset [optional]
+    #  @param string charset [optional] [default:"utf8"]
     #  @param string srk [optional]
     #  @param string mode [optional]
     #  @param string extension [optional]
-    #  @param integer delay [optional]
+    #  @param integer delay [optional] [default:"0"]
     #  @param boolean force_sms [optional]
-    #  @param string app_version [optional] }
+    #  @param string app_version [optional] 
+    #  @param string template_code [optional] 
+    #  @param string sender_key [optional] 
+    #  @param string only_ata [optional] [default:"false"] }
     #  @return JSONObject
+    #  @throws CoolsmsException
     def send(self, params):
         # params type check
         if type(params) is not dict:
@@ -65,7 +69,7 @@ class Message:
         files = {}
         if 'type' in params and params['type'] == 'mms':
             if 'image' not in params:
-                raise CoolsmsSDKException('image file is required')
+                raise CoolsmsSDKException('image file is required', 201)
 
             try:
                 with open(params['image'], 'rb') as content_file:
@@ -82,10 +86,10 @@ class Message:
 
     ## @brief get status ( HTTP Method GET )
     #  @param dictionary params {
-    #  @param integer count [optional]
+    #  @param integer count [optional] [default:"1"]
     #  @param string unit [optional]
-    #  @param string date [optional]
-    #  @param integer channel [optional] }
+    #  @param string date [optional] [default:현재시각]
+    #  @param integer channel [optional] [default:"1"] }
     #  @return JSONObject
     #  @throws CoolsmsException
     def status(self, params=None):
@@ -95,17 +99,17 @@ class Message:
     ## @brief sent messages ( HTTP Method GET )
     #  @param dictionary params {
     #  @param integer offset [optional]
-    #  @param integer limit [optional]
+    #  @param integer limit [optional] [default:"20"]
     #  @param string rcpt [optional]
     #  @param string start [optional]
     #  @param string end [optional]
     #  @param string status [optional]
     #  @param string status [optional]
     #  @param string resultcode [optional]
-    #  @param string notin_resultcode [optional]
     #  @param string message_id [optional]
     #  @param string group_id [optional] }
     #  @return JSONObject
+    #  @throws CoolsmsException
     def sent(self, params=None):
         response = self.cool.request_get('sent', params)
         return response 
@@ -113,6 +117,7 @@ class Message:
     ## @brief get remaining balance ( HTTP Method GET )
     #  @param None
     #  @return JSONobject
+    #  @throws CoolsmsException
     def balance(self):
         response = self.cool.request_get('balance')
         return response
@@ -122,6 +127,7 @@ class Message:
     #  @param string mid [optional]
     #  @param string gid [optional] }
     #  @return None
+    #  @throws CoolsmsException
     def cancel(self, params):
         if 'message_id' not in params and 'group_id' not in params:
             raise CoolsmsSDKException("message_id or group_id either one must be entered", 201)

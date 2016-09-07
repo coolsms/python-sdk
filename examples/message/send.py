@@ -39,6 +39,7 @@ if __name__ == "__main__":
     # params["app_version] = "Python SDK v2.0" # 어플리케이션 버전
 
     cool = Message(api_key, api_secret)
+
     try:
         response = cool.send(params)
         print("Success Count : %s" % response['success_count'])

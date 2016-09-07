@@ -21,6 +21,7 @@ class Image:
     #  @param string api_key [required]
     #  @param string api_secret [required]
     #  @param boolean use_http_connection [optional]
+    #  @throws CoolsmsException
     def __init__(self, api_key, api_secret, use_http_connection = False):
         self.cool = Coolsms(api_key, api_secret)
 
@@ -28,10 +29,11 @@ class Image:
         if use_http_connection == True:
             self.cool.use_http_connection()
 
-    # @brief get image list( HTTP Method GET )
-    # @param string offset [optional]
-    # @param string limit [optional]
-    # @return JSONObject
+    ## @brief get image list( HTTP Method GET )
+    #  @param string offset [optional] [default:"0"]
+    #  @param string limit [optional] [default:"20"]
+    #  @return JSONObject
+    #  @throws CoolsmsException
     def get_image_list(self, offset=None, limit=None):
         params = dict()
 
@@ -44,10 +46,10 @@ class Image:
 
         return response
 
-    # @brief get image info ( HTTP Method GET )
-    # @param string image_id [required]
-    # @return JSONObject
-    # @throws CoolsmsException
+    ## @brief get image info ( HTTP Method GET )
+    #  @param string image_id [required]
+    #  @return JSONObject
+    #  @throws CoolsmsException
     def get_image_info(self, image_id):
         if image_id == None:
             raise CoolsmsSDKException("'image_id' is required", 201);
@@ -57,9 +59,10 @@ class Image:
 
         return response
 
-    # @brief upload image ( HTTP Method POST )
-    # @param string image [required]
-    # @return JSONobject
+    ## @brief upload image ( HTTP Method POST )
+    #  @param string image [required]
+    #  @return JSONobject
+    #  @throws CoolsmsException
     def upload_image(self, image):
         if image == None:
             raise CoolsmsSDKException("'image' is required", 201);
@@ -81,9 +84,10 @@ class Image:
 
         return response
 
-    # @brief delete images ( HTTP Method POST )
-    # @param string image_ids [required]
-    # @return JSONObject 
+    ## @brief delete images ( HTTP Method POST )
+    #  @param string image_ids [required]
+    #  @return JSONObject 
+    #  @throws CoolsmsException
     def delete_images(self, image_ids):
         if image_ids == None:
             raise CoolsmsSDKException("'image_ids' is required", 201);

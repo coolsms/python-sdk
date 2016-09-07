@@ -16,11 +16,11 @@ class SenderID:
     # Coolsms Object
     cool = None
 
-
     ## @brief initialize
     #  @param string api_key [required]
     #  @param string api_secret [required]
     #  @param boolean use_http_connection [optional]
+    #  @throws CoolsmsException
     def __init__(self, api_key, api_secret, use_http_connection = False):
         self.cool = Coolsms(api_key, api_secret)
 
@@ -31,10 +31,11 @@ class SenderID:
         if use_http_connection == True:
             self.cool.use_http_connection()
 
-    #  @brief sender id registration request ( HTTP Method POST )
+    ## @brief sender id registration request ( HTTP Method POST )
     #  @param string phone [required]
-    #  @param string site_user [optional]
+    #  @param string site_user [optional] [default:"__private__"]
     #  @return JSONObject
+    #  @throws CoolsmsException
     def register(self, phone, site_user=None):
         if phone == None:
             raise CoolsmsSDKException("'phone' is required", 201);
@@ -48,9 +49,10 @@ class SenderID:
 
         return response
 
-    #  @brief verify sender id ( HTTP Method POST )
+    ## @brief verify sender id ( HTTP Method POST )
     #  @param string handle_key[required]
     #  @return None 
+    #  @throws CoolsmsException
     def verify(self, handle_key):
         if handle_key == None:
             raise CoolsmsSDKException("'handle_key' is required", 201);
@@ -61,9 +63,10 @@ class SenderID:
 
         return response
 
-    #  @brief delete sender id ( HTTP Method POST )
+    ## @brief delete sender id ( HTTP Method POST )
     #  @param string handle_key [required]
     #  @return None 
+    #  @throws CoolsmsException
     def delete(self, handle_key):
         if handle_key == None:
             raise CoolsmsSDKException("'handle_key' is required", 201);
@@ -74,9 +77,10 @@ class SenderID:
 
         return response
 
-    #  @brief get sender id list ( HTTP Method GET )
-    #  @param string site_user [optional]
+    ## @brief get sender id list ( HTTP Method GET )
+    #  @param string site_user [optional] [default:"__private__"]
     #  @return JSONObject 
+    #  @throws CoolsmsException
     def get_list(self, site_user=None):
         params = dict()
 
@@ -86,10 +90,11 @@ class SenderID:
         response = self.cool.request_get('list', params)
         return response
 
-    #  @brief set default sender id ( HTTP Method POST )
+    ## @brief set default sender id ( HTTP Method POST )
     #  @param string handle_key [required]
-    #  @param string site_user [optional]
+    #  @param string site_user [optional] [default:"__private__"]
     #  @return None
+    #  @throws CoolsmsException
     def set_default(self, handle_key, site_user=None):
         if handle_key == None:
             raise CoolsmsSDKException("'handle_key' is required", 201);
@@ -104,9 +109,10 @@ class SenderID:
 
         return response
 
-    #  @brief get default sender id ( HTTP Method GET )
-    #  @param string site_user [optional]
+    ## @brief get default sender id ( HTTP Method GET )
+    #  @param string site_user [optional] [default:"__private__"]
     #  @return JSONObject
+    #  @throws CoolsmsException
     def get_default(self, site_user=None):
         params = dict()
 
