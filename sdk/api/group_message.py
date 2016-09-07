@@ -21,8 +21,13 @@ class GroupMessage:
     ## @brief initialize
     #  @param string api_key [required]
     #  @param string api_secret [required]
-    def __init__(self, api_key, api_secret):
+    #  @param boolean use_http_connection [optional]
+    def __init__(self, api_key, api_secret, use_http_connection = False):
         self.cool = Coolsms(api_key, api_secret)
+
+        # if True. use http connection
+        if use_http_connection == True:
+            self.cool.use_http_connection()
 
     ## @brief create create group ( HTTP Method GET )
     #  @param dictionary params {

@@ -19,9 +19,11 @@ from sdk.exceptions import CoolsmsServerException
 # use sys.version_info[0] for python 2.6
 if sys.version_info[0] == 2:
     from httplib import HTTPSConnection
+    from httplib import HTTPConnection
     from urllib import urlencode
 else:
     from http.client import HTTPSConnection
+    from http.client import HTTPConnection
     from urllib.parse import urlencode
 
 ## @mainpage PYTHON SDK
@@ -64,15 +66,18 @@ class Coolsms:
     # error handle
     error_string = None
 
+    # if True. use http connection
+    use_http_connection = False
+
     ## @brief initialize
     #  @param string api_key [required]
     #  @param string api_secret [required]
-    def __init__(self, api_key=str(), api_secret=str()):
+    def __init__(self, api_key, api_secret):
         self.api_key = api_key
         self.api_secret = api_secret
 
     ## @brief get signature
-    #  @return string salt, string timestamp, string signature
+    #  @return string timestamp, string salt, string signature
     def __get_signature__(self):
         salt = str(uuid.uuid1())
         timestamp = str(int(time.time()))
@@ -83,57 +88,50 @@ class Coolsms:
     #  @param string resource [required]
     #  @param dictionary params [optional]
     #  @return JSONObject
-    def request_get(self, resource, params=None):
-        if params == None:
-            params = dict()
-
-        params = self.set_base_params(params)
-        params_str = urlencode(params)
-        headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
-                   "User-Agent": "sms-python"}
-        conn = HTTPSConnection(self.host, self.port)
-        conn.request("GET", "/%s/%s/%s?" % (self.api_name, self.api_version, resource) + params_str, None, headers)
-        response = conn.getresponse()
-        data = response.read().decode()
-        conn.close()
-
-        # https status code is not 200, raise Exception
-        if response.status != 200:
-            error_msg = response.reason
-            if(data):
-                error_msg = data
-            
-            raise CoolsmsServerException(error_msg, response.status)
-
-        # response data parsing
-        obj = None
-        if data:
-            obj = json.loads(data)
-
-        return obj
+    def request_get(self, resource, params=dict()):
+        return self.request(resource, params)
 
     ## @brief http POST method request 
     #  @param string resource [required]
     #  @param dictionary params [optional]
     #  @return JSONObject
-    def request_post(self, resource, params=None):
-        if params == None:
-            params = dict()
+    def request_post(self, resource, params=dict()):
+        return self.request(resource, params, "POST")
 
+    ## @brief http POST & GET method request process
+    #  @param string resource [required]
+    #  @param dictionary params [required]
+    #  @param string method [optional] [default:"GET"]
+    #  @return JSONObject
+    def request(self, resource, params, method="GET"):
         params = self.set_base_params(params)
         params_str = urlencode(params)
         headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain",
                    "User-Agent": "sms-python"}
-        conn = HTTPSConnection(self.host, self.port)
-        conn.request("POST", "/%s/%s/%s" % (self.api_name, self.api_version, resource), params_str, headers)
-        response = conn.getresponse()
-        data = response.read().decode()
-        conn.close()
+        try:
+            # use_http_connection 이 True 라면 http 통신을 한다
+            if self.use_http_connection == True:
+                conn = HTTPConnection(self.host)
+            else:
+                conn = HTTPSConnection(self.host, self.port)
+
+            # request method 에 따라 다르게 요청
+            if method == "GET":
+                conn.request("GET", "/%s/%s/%s?" % (self.api_name, self.api_version, resource) + params_str, None, headers)
+            else:
+                conn.request("POST", "/%s/%s/%s" % (self.api_name, self.api_version, resource), params_str, headers)
+
+            response = conn.getresponse()
+            data = response.read().decode()
+            conn.close()
+        except Exception as e:
+            conn.close()
+            raise CoolsmsSystemException(e, 399)
 
         # https status code is not 200, raise Exception
         if response.status != 200:
             error_msg = response.reason
-            if(data):
+            if data:
                 error_msg = data
             
             raise CoolsmsServerException(error_msg, response.status)
@@ -156,21 +154,31 @@ class Coolsms:
         params = self.set_base_params(params)
 
         content_type, body = self.encode_multipart_formdata(params, files)
-        conn = HTTPSConnection(host)
-        conn.putrequest('POST', selector)
-        conn.putheader('Content-type', content_type)
-        conn.putheader('Content-length', str(len(body)))
-        conn.putheader('User-Agent', 'sms-python')
-        conn.endheaders()
-        conn.send(body)
-        response = conn.getresponse()
-        data = response.read().decode()
-        conn.close()
+
+        try:
+            # use_http_connection 이 True 라면 http 통신을 한다
+            if self.use_http_connection == True:
+                conn = HTTPConnection(self.host)
+            else:
+                conn = HTTPSConnection(self.host, self.port)
+
+            conn.putrequest('POST', selector)
+            conn.putheader('Content-type', content_type)
+            conn.putheader('Content-length', str(len(body)))
+            conn.putheader('User-Agent', 'sms-python')
+            conn.endheaders()
+            conn.send(body)
+            response = conn.getresponse()
+            data = response.read().decode()
+            conn.close()
+        except Exception as e:
+            conn.close()
+            raise CoolsmsSystemException(e, 399)
 
         # https status code is not 200, raise Exception
         if response.status != 200:
             error_msg = response.reason
-            if(data):
+            if data:
                 error_msg = data
             
             raise CoolsmsServerException(error_msg, response.status)
@@ -260,3 +268,7 @@ class Coolsms:
     def set_api_config(self, api_name, api_version):
         self.api_name = api_name;
         self.api_version = api_version;
+
+    ## @brief use http connection
+    def use_http_connection(self):
+        self.use_http_connection = True
