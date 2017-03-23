@@ -4,7 +4,7 @@ Send Message & Message Management using Python and REST API.
 
 ## Version
 
-v2.0.1
+v2.0.2
 
 ## License
 
