@@ -20,10 +20,10 @@ BSD License
 
 ### Send Message
 ```python
-	from sdk.api.message import Message
-	from sdk.exceptions import CoolsmsException
+    from sdk.api.message import Message
+    from sdk.exceptions import CoolsmsException
 
-	# set api key, api secret
+    # set api key, api secret
     api_key = "#ENTER_YOUR_OWN#"
     api_secret = "#ENTER_YOUR_OWN#"
 
@@ -34,7 +34,7 @@ BSD License
     params['from'] = '01000000000' # Sender number
     params['text'] = 'Test Message' # Message
 
-	cool = Message(api_key, api_secret)
+    cool = Message(api_key, api_secret)
     try:
         response = cool.send(params)
         print("Success Count : %s" % response['success_count'])
@@ -51,10 +51,10 @@ BSD License
 
 ### Message History
 ```python
-	from sdk.api.message import Message
-	from sdk.exceptions import CoolsmsException
+    from sdk.api.message import Message
+    from sdk.exceptions import CoolsmsException
 
-	# set api key, api secret
+    # set api key, api secret
     api_key = "#ENTER_YOUR_OWN#"
     api_secret = "#ENTER_YOUR_OWN#"
 
