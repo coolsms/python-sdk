@@ -258,7 +258,7 @@ class Coolsms:
                 params['to'] = ','.join(to)
 
             # message type check
-            if key == "type" and val.lower() not in ['sms', 'lms', 'mms', 'ata']:
+            if key == "type" and val.lower() not in ['sms', 'lms', 'mms', 'ata', 'cta']:
                 raise CoolsmsSDKException("message type is not supported", 201)
 
         return params
