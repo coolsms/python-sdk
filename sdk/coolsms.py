@@ -29,7 +29,7 @@ else:
 ## @mainpage PYTHON SDK
 #  @section intro 소개
 #      - 소개 : Coolsms REST API SDK FOR PYTHON
-#      - 버전 : 2.0.2
+#      - 버전 : 2.0.3
 #      - 설명 : Coolsms REST API 를 이용 보다 빠르고 안전하게 문자메시지를 보낼 수 있는 PYTHON으로 만들어진 SDK 입니다.
 #  @section CreateInfo 작성 정보
 #      - 작성자 : Nurigo
@@ -43,7 +43,7 @@ else:
 #  @brief Gateway access url : https://api.coolsms.co.kr/{api type}/{verson}/{resource name}
 class Coolsms:
     # SDK Version
-    sdk_version = "2.0.2"
+    sdk_version = "2.0.3"
 
     # API Version
     api_version = "2"
