@@ -22,8 +22,8 @@ if __name__ == "__main__":
     # params["offset"] = "0" # default 0
     # params["limit"] = "1" # default 20
     # params["rcpt"] = "01000000000" # search sent result by recipient number 
-    # params["start"] = "201601070915" # set search start date 
-    # params["end"] = "201601071230" # set search end date
+    # params["start"] = "20160107091500" # set search start date 
+    # params["end"] = "20160107123000" # set search end date
 
     cool = Message(api_key, api_secret)
     try:
