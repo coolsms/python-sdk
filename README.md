@@ -1,3 +1,5 @@
+# 🛑 이 패키지는 더이상 지원되지 않습니다! 추후 PIP 혹은 그와 유사한 패키지 매니저로 배포할 예정에 있는 [SOLAPI SDK](https://github.com/solapi/solapi-python)를 사용해보세요!
+
 # Coolsms Python SDK
 
 Send Message & Message Management using Python and REST API.
